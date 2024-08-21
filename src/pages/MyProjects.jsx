@@ -1,18 +1,28 @@
 import React from 'react'
-import {
-  Accordion,
-  AccordionHeader,
-  AccordionBody,
-} from "@material-tailwind/react";
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-function MyProjects() {
-  const percentage = 50;
-  const percentage2 = 25;
-  const percentage3 = 10;
-  const [open, setOpen] = React.useState(1);
 
-  const handleOpen = (value) => setOpen(open === value ? 0 : value);
+import { gql, useQuery, } from '@apollo/client';
+
+// gql
+
+const GET_PROJECT = gql`
+  query{
+    CommonClientProject(ClientId:8){
+	    project{
+	      name
+        startAt
+        endAt
+        }
+  finishedPercentage
+}
+}
+`
+function MyProjects() {
+
+  const {data:MyProject} = useQuery(GET_PROJECT)
+  console.log(MyProject);
+  
 
   return (
     <div className='MyProject w-full pb-[50px] pr-[200px]'>
@@ -21,18 +31,19 @@ function MyProjects() {
           Loyihalarim
         </h1>
         <div className='MyProject__wrapper mt-[25px] grid grid-cols-3 gap-[30px]'>
+          {MyProject?.CommonClientProject.map((i)=>(
           <div className=' MyProject__card bg-white  text-center rounded-[16px] w-[284px] pb-[10px] h-fit'>
             <div className='w-full p-[30px]'>
               <div className='w-[105px] h-[105px] mx-auto'>
                 <CircularProgressbar
-                  value={percentage}
-                  text={`${percentage}%`}
+                  value={i.finishedPercentage}
+                  text={`${i.finishedPercentage}%`}
                   strokeWidth={12}
                   styles={buildStyles({
                     textColor: "#00C853", // Цвет текста
                     pathColor: "#00C853", // Цвет прогресса
                     trailColor: "#d6d6d6", // Цвет фона прогресса
-                    textSize: '34px',
+                    textSize: '30px',
                     textAnchor: 'middle',
                     textAlign: 'center',
                     fontWeight: 'bold',
@@ -41,7 +52,7 @@ function MyProjects() {
                 />
               </div>
               <span className='font-[500] text-[16px] font-montserrat block mb-[30px] mt-[10px]'>
-                “Loyiha nomi”
+                {i.project.name}
               </span>
               <div className='flex items-center gap-[10px] flex-col w-full'>
                 <div className='flex items-center justify-between w-full'>
@@ -52,7 +63,7 @@ function MyProjects() {
                     </span>
                   </div>
                   <span className='font-[500] text-[16px] text-[#83818E] font-montserrat'>
-                    19.09.24
+                    {i.project.startAt.split('T')[0]}
                   </span>
                 </div>
                 <div className='flex items-center justify-between w-full'>
@@ -64,47 +75,14 @@ function MyProjects() {
                     </span>
                   </div>
                   <span className='font-[500] text-[16px] text-[#83818E] font-montserrat'>
-                    19.09.24
+                    {i.project.endAt.split('T')[0]}
                   </span>
                 </div>
               </div>
             </div>
-
-            <Accordion open={open === 1}>
-              <AccordionHeader onClick={() => handleOpen(1)}>
-                <button className='font-montserrat text-[16px] text-[#1F1E30] font-[500] border-t-2 w-full pt-[10px]'>
-                ko’proq
-              </button>
-              </AccordionHeader>
-              <AccordionBody>
-               <div className='flex items-center justify-between px-[20px] mb-[15px]'>
-                  <span>
-                  frontend
-                  </span>
-                  <button className='px-[8px] py-[2px] bg-[#1ADC73] rounded-[5px] text-white'>
-                    50%
-                  </button>
-               </div>
-               <div className='flex items-center justify-between px-[20px] mb-[15px]'>
-                  <span>
-                  ui ux
-                  </span>
-                  <button className='px-[8px] py-[2px] bg-[#F00B0B] rounded-[5px] text-white'>
-                    10%
-                  </button>
-               </div>
-               <div className='flex items-center justify-between px-[20px] mb-[15px]'>
-                  <span>
-                  backend
-                  </span>
-                  <button className='px-[8px] py-[2px] bg-[#F97B07] rounded-[5px] text-white'>
-                    25%
-                  </button>
-               </div>
-              </AccordionBody>
-            </Accordion>
           </div>
-          <div className=' MyProject__card bg-white  text-center rounded-[16px] w-[284px] pb-[10px] h-fit'>
+          ))}
+          {/* <div className=' MyProject__card bg-white  text-center rounded-[16px] w-[284px] pb-[10px] h-fit'>
             <div className='w-full p-[30px]'>
               <div className='w-[105px] h-[105px] mx-auto'>
                 <CircularProgressbar
@@ -152,40 +130,6 @@ function MyProjects() {
                 </div>
               </div>
             </div>
-
-            <Accordion open={open === 2}>
-              <AccordionHeader onClick={() => handleOpen(2)}>
-                <button className='font-montserrat text-[16px] text-[#1F1E30] font-[500] border-t-2 w-full pt-[10px]'>
-                ko’proq
-              </button>
-              </AccordionHeader>
-              <AccordionBody>
-               <div className='flex items-center justify-between px-[20px] mb-[15px]'>
-                  <span>
-                  frontend
-                  </span>
-                  <button className='px-[8px] py-[2px] bg-[#1ADC73] rounded-[5px] text-white'>
-                    50%
-                  </button>
-               </div>
-               <div className='flex items-center justify-between px-[20px] mb-[15px]'>
-                  <span>
-                  ui ux
-                  </span>
-                  <button className='px-[8px] py-[2px] bg-[#F00B0B] rounded-[5px] text-white'>
-                    10%
-                  </button>
-               </div>
-               <div className='flex items-center justify-between px-[20px] mb-[15px]'>
-                  <span>
-                  backend
-                  </span>
-                  <button className='px-[8px] py-[2px] bg-[#F97B07] rounded-[5px] text-white'>
-                    25%
-                  </button>
-               </div>
-              </AccordionBody>
-            </Accordion>
           </div>
           <div className=' MyProject__card bg-white  text-center rounded-[16px] w-[284px] pb-[10px] h-fit'>
             <div className='w-full p-[30px]'>
@@ -235,41 +179,7 @@ function MyProjects() {
                 </div>
               </div>
             </div>
-
-            <Accordion open={open === 3}>
-              <AccordionHeader onClick={() => handleOpen(3)}>
-                <button className='font-montserrat text-[16px] text-[#1F1E30] font-[500] border-t-2 w-full pt-[10px]'>
-                ko’proq
-              </button>
-              </AccordionHeader>
-              <AccordionBody>
-               <div className='flex items-center justify-between px-[20px] mb-[15px]'>
-                  <span>
-                  frontend
-                  </span>
-                  <button className='px-[8px] py-[2px] bg-[#1ADC73] rounded-[5px] text-white'>
-                    50%
-                  </button>
-               </div>
-               <div className='flex items-center justify-between px-[20px] mb-[15px]'>
-                  <span>
-                  ui ux
-                  </span>
-                  <button className='px-[8px] py-[2px] bg-[#F00B0B] rounded-[5px] text-white'>
-                    10%
-                  </button>
-               </div>
-               <div className='flex items-center justify-between px-[20px] mb-[15px]'>
-                  <span>
-                  backend
-                  </span>
-                  <button className='px-[8px] py-[2px] bg-[#F97B07] rounded-[5px] text-white'>
-                    25%
-                  </button>
-               </div>
-              </AccordionBody>
-            </Accordion>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
