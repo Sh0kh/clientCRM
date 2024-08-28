@@ -44,7 +44,7 @@ function Contracts() {
     };
   }, [isActive]);
 
-  const { data: AllContract, loading, error } = useQuery(GET_CONTRACT, {
+  const { data: AllContract, } = useQuery(GET_CONTRACT, {
     variables: { clientId },
     skip: !clientId
   });
@@ -100,8 +100,8 @@ function Contracts() {
     GetID();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+
+  const hasContract = AllContract?.CommonClientProject?.length > 0
 
   return (
     <div className='Contracts w-full pb-[50px] pr-[200px]'>
@@ -109,6 +109,13 @@ function Contracts() {
         <h1 className='text-[42px] font-[600] text-TitleColor font-montserrat'>
           Shartnomalar
         </h1>
+        {!hasContract ? (
+               <div className='w-full h-[400px] flex items-center justify-center'>
+               <h2 className='font-bold text-[#818080]'>
+               Shartnomalar hozircha yoq !
+               </h2>
+             </div>
+        ) : (
         <div className='Contracts__wrapper mt-[25px] grid grid-cols-3 gap-[30px]'>
           {AllContract?.CommonClientProject?.map((project) => (
             <div key={project.project.id} className='Contract__card bg-white p-[30px] text-center rounded-[16px] w-[284px]'>
@@ -125,6 +132,7 @@ function Contracts() {
             </div>
           ))}
         </div>
+        )}
       </div>
       <div className={`PaymentModal p-[5px] bg-[#d9d9d9bc] fixed inset-0 flex items-center justify-center ${isActive ? 'PaymentModalActive' : ''}`}>
         <div ref={modalRef} className='Modal bg-customBg rounded-[16px] p-[30px] w-[360px]'>

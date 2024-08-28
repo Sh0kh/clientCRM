@@ -79,6 +79,8 @@ function Payments() {
     GetID();
   }, []);
   
+
+  const hasProject = AllPayments?.CommonClientProject?.length > 0 
   return (
     <div className='Payment w-full pb-[50px] '>
       <div className='mt-[50px]'>
@@ -86,7 +88,14 @@ function Payments() {
           <h1 className='text-[42px] font-[600] text-TitleColor font-montserrat'>
             To’lovlar
           </h1>
-        </div>
+          </div>
+          {!hasProject ?(
+             <div className='w-full h-[400px] flex items-center justify-center'>
+             <h2 className='font-bold text-[#818080]'>
+              To’lovlar hozircha yoq !
+             </h2>
+           </div>
+          ) : (
         <div className='Payment__wrapper mt-[25px] grid grid-cols-3 gap-[30px] pr-[200px]'>
           {AllPayments?.CommonClientProject?.map((i)=>(
           <div className=' Payment__card bg-white p-[30px] text-center rounded-[16px] w-[284px]'>
@@ -100,6 +109,7 @@ function Payments() {
           </div>
           ))}
         </div>
+          )}
       </div>
       <div className={`PaymentModal p-[5px] bg-[#d9d9d9bc] fixed inset-0 flex items-center justify-center ${isActive ? 'PaymentModalActive' : ''}`}>
         <div ref={modalRef} className='Modal bg-customBg rounded-[16px] p-[30px] w-[360px]'>
