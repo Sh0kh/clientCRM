@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import PDF from '/images/PDF.png';
-import CONFIG from '../utils/config';
+import CONFIG from '../utils/Config';
 import { gql, useQuery } from '@apollo/client';
+import { $axios } from '../utils';
 
 const GET_CONTRACT = gql`
-  query {
-    CommonClientProject(ClientId: 8) {
+  query($clientId: Int!) {
+    CommonClientProject(ClientId: $clientId) {
       project {
         id
         name
@@ -20,16 +21,20 @@ const GET_CONTRACT = gql`
 `;
 
 function Contracts() {
-  const [isActive, setActive] = useState(false)
-
+  const [isActive, setActive] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [clientId, setClientId] = useState(null);
+  
   const modalRef = useRef(null);
+
   const handleClickOutside = (e) => {
     if (modalRef.current && !modalRef.current.contains(e.target)) {
       setActive(false);
     }
   };
+
   useEffect(() => {
-    if (isActive ) {
+    if (isActive) {
       document.addEventListener('mousedown', handleClickOutside);
     } else {
       document.removeEventListener('mousedown', handleClickOutside);
@@ -38,13 +43,15 @@ function Contracts() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isActive]);
-  const { data: AllContract } = useQuery(GET_CONTRACT);
-  
-  const [selectedProject, setSelectedProject] = useState(null);
+
+  const { data: AllContract, loading, error } = useQuery(GET_CONTRACT, {
+    variables: { clientId },
+    skip: !clientId
+  });
 
   const ActivePaymentModal2 = (project) => {
     setSelectedProject(project);
-    setActive(!isActive)
+    setActive(!isActive);
   };
 
   const downloadFile = async (path, name) => {
@@ -68,10 +75,33 @@ function Contracts() {
         window.URL.revokeObjectURL(url); 
         document.body.removeChild(link); 
       } else {
+        console.error('Download failed:', response.statusText);
       }
     } catch (error) {
+      console.error('Error downloading file:', error);
     }
   };
+
+  const GetID = () => {
+    $axios.get('/common-user/myInformation', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    })
+    .then((response) => {
+      setClientId(response.data.id);
+    })
+    .catch((error) => {
+      console.error('Error fetching profile:', error);
+    });
+  };
+
+  useEffect(() => {
+    GetID();
+  }, []);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
   return (
     <div className='Contracts w-full pb-[50px] pr-[200px]'>
@@ -95,22 +125,20 @@ function Contracts() {
             </div>
           ))}
         </div>
-
-       
       </div>
       <div className={`PaymentModal p-[5px] bg-[#d9d9d9bc] fixed inset-0 flex items-center justify-center ${isActive ? 'PaymentModalActive' : ''}`}>
         <div ref={modalRef} className='Modal bg-customBg rounded-[16px] p-[30px] w-[360px]'>
           <h2 className='text-btnColor text-[26px] font-[600]'>
-          Shartnomalar
+            Shartnomalar
           </h2>
           <div className='mt-6'>
-            {selectedProject.contract.map((contract) => (
+            {selectedProject?.contract?.map((contract) => (
               <div key={contract.id} className='mb-4 flex items-center justify-center'>
                 <button 
-                  onClick={() => downloadFile(contract.path, contract.name)} 
+                  onClick={() => downloadFile(contract?.path, contract?.name)} 
                   className="flex items-center justify-center gap-[5px] flex-col text-[white]"
                 >
-                  <img src={PDF} alt={contract.name} className='inline' />
+                  <img src={PDF} alt={contract?.name} className='inline' />
                   <span>{contract.name}</span>
                 </button>
               </div>

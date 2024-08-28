@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
-import Language from  '/images/Language.png'
+import React, { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useLocation } from 'react-router-dom'
+import { $axios } from '../utils'
+import CONFIG from '../utils/Config'
 function Navbar() {
   const [IsActive, setActive] = useState(false)
   const NavModal = () =>{
@@ -9,29 +10,43 @@ function Navbar() {
   }
   const location = useLocation()
   const Dashboard = location.pathname === '/'
-  const Contract = location.pathname === '/contracts'
   const Payment = location.pathname === '/payments'
-
+  const Contract  = location.pathname === '/contract'
+  const FotoPerson = 'https://t4.ftcdn.net/jpg/00/65/77/27/360_F_65772719_A1UV5kLi5nCEWI0BNLLiFaBPEkUbv5Fv.jpg'
+  const [information, setInformation] = useState([])
+  const GetProfileFoto = ()=>{
+    $axios.get('/common-user/myInformation', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    })
+      .then((response) => {        
+        setInformation(response.data)       
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+  }
+  useEffect(()=>{
+    GetProfileFoto()
+  },[])
   return (
     <div className='NavBar w-full relative' >
       <div className='flex items-center  justify-between gap-[5px] w-full'>
-        <form>
-          <label htmlFor="" className='flex items-center  gap-[5px] py-[11px] px-[11px] bg-white rounded-[16px] border-[0.1px] border-[#B4B5B0] w-[400px]'> 
-          <svg className='text-[24px] text-[#56565B]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m18 11l-6-6"></path></svg>
-          <input type="text" placeholder='Qidiruv' className='outline-none w-full text-[16px]' />
-          </label>
-        </form>
-        <div className='flex gap-[21px] '>
-          <button className='NavbarBtn bg-white rounded-[16px] border-[0.5px] border-[#B4B5B0] p-[9px] relative'>
-          <svg className='text-[25px] text-[#C2C7CE]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M8.645 20.5a3.502 3.502 0 0 0 6.71 0zM3 19.5h18v-3l-2-3v-5a7 7 0 1 0-14 0v5l-2 3z"></path></svg>
-          <span className='absolute top-[-10px] right-[-10px] bg-[#3AACCF] px-[8px] py-[1px] rounded-[50px] text-white'>
-            2
-          </span>
-          </button>
-          <button className='NavbarBtn bg-white rounded-[16px] border-[0.5px] border-[#B4B5B0] p-[9px]'>
-              <img className='w-[28px] h-[28px]' src={Language} alt="" />
-          </button>
-        </div>
+       <form></form>
+        <NavLink to='/profil'>
+            <div className='bg-white rounded-[16px] border-[0.5px] border-[#B4B5B0] p-[2px] px-[9px] flex items-center gap-[10px]'>
+                <img className='w-[28px] h-[28px] object-cover rounded-[50%]' src={information.avatarUrl ?  CONFIG.API_URL + information.avatarUrl : FotoPerson} alt="" />
+                <div className='flex  flex-col'>
+                  <span className='text-[16px] font-medium font-montserrat'>
+                    {information.name}
+                  </span>
+                  <span className='text-[12px] font-medium text-[#83818E] font-montserrat'>
+                  {information.role}
+                  </span>
+                </div>
+            </div>
+          </NavLink>
         <button className='burger text-[30px] hidden'  onClick={NavModal}>
         <svg  xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6h18M3 12h18M3 18h18"></path></svg>
         </button>

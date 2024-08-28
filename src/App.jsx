@@ -6,7 +6,9 @@ import MyProjects from "./pages/MyProjects"
 import MainLayout from "./layouts/MainLayout"
 import Contracts from "./pages/Contracts"
 import Payments from "./pages/Payments"
+import Profil from './pages/Profil'
 import './pages/Media.css'
+
 
 function App() {
 
@@ -20,6 +22,7 @@ function App() {
           <Route path="/contracts" element={<Contracts/>}/>
           <Route path="/payments" element={<Payments/>}/>
             <Route path="employees" element={<EmployeeList />} />
+            <Route path="/profil" element={<Profil/>}/>
           </Route>
         </Route>
       </Routes>

@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react'
 import PaymentFoto from '/images/payment.png'
 import PaymentFoto2 from '/images/PaymentCek.png'
+import { $axios } from '../utils';
 // gql
 import { gql, useQuery } from '@apollo/client';
-
 const GET_PAYEMTS = gql`
-  query{
-  CommonClientProject(ClientId:8){
+  query($clientId: Int!){
+  CommonClientProject(ClientId:$clientId){
     project{
       id
       name
@@ -24,6 +24,8 @@ function Payments() {
   const [isActive2, setActive2] = useState(false)
   const modalRef = useRef(null);
   const modalRef2 = useRef(null);
+  const [clientId, setClientId] = useState(null);
+
 
   const ActivePaymentModal = () => {
     setActive(!isActive)
@@ -49,12 +51,33 @@ function Payments() {
   }, [isActive, isActive2]);
 
 
-  const {data:AllPayments} = useQuery(GET_PAYEMTS)
+  const {data:AllPayments} = useQuery(GET_PAYEMTS,{
+    variables:{ clientId },
+    skip: !clientId
+  })
   const [selectedProject, setSelectedProject] = useState(null);
   const ActivePaymentModal2 = (project) => {
     setActive2(!isActive2)
     setSelectedProject(project);
   }
+
+  const GetID = () => {
+    $axios.get('/common-user/myInformation', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    })
+    .then((response) => {
+      setClientId(response.data.id);
+    })
+    .catch((error) => {
+      console.error('Error fetching profile:', error);
+    });
+  };
+
+  useEffect(() => {
+    GetID();
+  }, []);
   
   return (
     <div className='Payment w-full pb-[50px] '>
